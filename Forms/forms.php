@@ -1,48 +1,97 @@
 <?php
-class forms {
-    public function signup($conf, $ObjFncs) {
-      $err = $ObjFncs->getMsg('errors'); print $ObjFncs->getMsg('msg');
- ?>
-            <h2>Sign Up Here</h2>
-<form action='' method='post' autocomplete="off">
-  <div class="mb-3">
-    <label for="fullname" class="form-label">Fullname</label>
-    <input type="text" class="form-control" id="fullname" name="fullname" aria-describedby="fullnameHelp" maxlength="50" placeholder="Enter your fullname" value="<?php echo (isset($_SESSION['fullname'])) ? $_SESSION['fullname'] : ''; unset($_SESSION['fullname']); ?>" required>
-    <?php echo (isset($err['fullname_error'])) ? "<div id='fullnameHelp' class='alert alert-danger'>".$err['fullname_error']."</div>" : ''; ?>
-  </div>
-  <div class="mb-3">
-    <label for="email" class="form-label">Email address</label>
-    <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" maxlength="100" placeholder="Enter your email" value="<?php echo (isset($_SESSION['email'])) ? $_SESSION['email'] : ''; unset($_SESSION['email']); ?>" required>
-    <?php echo (isset($err['mailFormat_error'])) ? "<div id='emailHelp' class='alert alert-danger'>".$err['mailFormat_error']."</div>" : ''; ?>
-    <?php echo (isset($err['mailDomain_error'])) ? "<div id='emailHelp' class='alert alert-danger'>".$err['mailDomain_error']."</div>" : ''; ?>
-  </div>
-  <div class="mb-3">
-    <label for="password" class="form-label">Password</label>
-    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" value="<?php echo (isset($_SESSION['password'])) ? $_SESSION['password'] : ''; unset($_SESSION['password']); ?>" required>
-    <?php echo (isset($err['password_length_error'])) ? "<div id='passwordHelp' class='alert alert-danger'>".$err['password_length_error']."</div>" : ''; ?>
-  </div>
-  <?php echo $this->submit_button('Sign Up', 'signup'); ?> <a href='signin.php'>Already have an account? Sign in</a>
-</form>
-<?php
-    }
-    private function submit_button($value, $name) {
-        return "<button type='submit' class='btn btn-primary' name='$name'>$value</button>";
-    }
-    public function signin() {
+class AuthForms {
+    public function registerForm($config, $utils) {
+        $validationErrors = $utils->getMsg('errors'); 
+        echo $utils->getMsg('msg');
 ?>
-            <h2>Sign In Here</h2>
-<form action='' method='post'>
-  <div class="mb-3">
-    <label for="email" class="form-label">Email address</label>
-    <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
-    <div id="emailHelp" class="form-text"></div>
-  </div>
-  <div class="mb-3">
-    <label for="password" class="form-label">Password</label>
-    <input type="password" class="form-control" id="password">
-  </div>
-  <?php echo $this->submit_button('Sign In', 'signin'); ?> <a href='signup.php'>Don't have an account? Sign up</a>
-</form>
+        <h2>Create Your Account</h2>
+        <form action="" method="post" autocomplete="off">
+            <div class="mb-3">
+                <label for="user_fullname" class="form-label">Full Name</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="user_fullname" 
+                    name="fullname" 
+                    maxlength="50" 
+                    placeholder="Enter full name" 
+                    value="<?php echo isset($_SESSION['fullname']) ? $_SESSION['fullname'] : ''; unset($_SESSION['fullname']); ?>" 
+                    required
+                >
+                <?php 
+                    if (isset($validationErrors['fullname_error'])) {
+                        echo "<div class='alert alert-danger'>{$validationErrors['fullname_error']}</div>";
+                    }
+                ?>
+            </div>
+
+            <div class="mb-3">
+                <label for="user_email" class="form-label">Email</label>
+                <input 
+                    type="email" 
+                    class="form-control" 
+                    id="user_email" 
+                    name="email" 
+                    maxlength="100" 
+                    placeholder="Enter email address" 
+                    value="<?php echo isset($_SESSION['email']) ? $_SESSION['email'] : ''; unset($_SESSION['email']); ?>" 
+                    required
+                >
+                <?php 
+                    if (isset($validationErrors['mailFormat_error'])) {
+                        echo "<div class='alert alert-danger'>{$validationErrors['mailFormat_error']}</div>";
+                    }
+                    if (isset($validationErrors['mailDomain_error'])) {
+                        echo "<div class='alert alert-danger'>{$validationErrors['mailDomain_error']}</div>";
+                    }
+                ?>
+            </div>
+
+            <div class="mb-3">
+                <label for="user_pass" class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    class="form-control" 
+                    id="user_pass" 
+                    name="password" 
+                    placeholder="Enter password" 
+                    value="<?php echo isset($_SESSION['password']) ? $_SESSION['password'] : ''; unset($_SESSION['password']); ?>" 
+                    required
+                >
+                <?php 
+                    if (isset($validationErrors['password_length_error'])) {
+                        echo "<div class='alert alert-danger'>{$validationErrors['password_length_error']}</div>";
+                    }
+                ?>
+            </div>
+
+            <?php echo $this->formButton('Sign Up', 'signup'); ?> 
+            <a href="signin.php">Already registered? Log in</a>
+        </form>
 <?php
     }
-}   
+
+    private function formButton($label, $fieldName) {
+        return "<button type='submit' class='btn btn-primary' name='$fieldName'>$label</button>";
+    }
+
+    public function loginForm() {
+?>
+        <h2>Log Into Your Account</h2>
+        <form action="" method="post">
+            <div class="mb-3">
+                <label for="login_email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="login_email" name="email">
+            </div>
+
+            <div class="mb-3">
+                <label for="login_pass" class="form-label">Password</label>
+                <input type="password" class="form-control" id="login_pass" name="password">
+            </div>
+
+            <?php echo $this->formButton('Sign In', 'signin'); ?> 
+            <a href="signup.php">Need an account? Register</a>
+        </form>
+<?php
+    }
+}
