@@ -1,21 +1,21 @@
 <?php
-class fncs{
+class SessionHelper {
 
-    // Set session message
-    public function setMsg($name, $value, $class){
-        if(is_array($value)){
-            $_SESSION[$name] = $value;
+    // Save message into session
+    public function storeMessage($key, $message, $type = 'info') {
+        if (is_array($message)) {
+            $_SESSION[$key] = $message;
         } else {
-            $_SESSION[$name] = "<div class='alert alert-$class'>".$value."</div>";
+            $_SESSION[$key] = "<div class='alert alert-{$type}'>{$message}</div>";
         }
     }
 
-    // Get session message
-    public function getMsg($name){
-        if(isset($_SESSION[$name])){
-            $msg = $_SESSION[$name];
-            unset($_SESSION[$name]);
-            return $msg;
+    // Retrieve and clear session message
+    public function fetchMessage($key) {
+        if (!empty($_SESSION[$key])) {
+            $stored = $_SESSION[$key];
+            unset($_SESSION[$key]);
+            return $stored;
         }
         return null;
     }
