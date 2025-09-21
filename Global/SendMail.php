@@ -4,38 +4,39 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-class SendMail {
-    public function Send_Mail($conf, $mailCnt) {
+// Load PHPMailer only once (better at the top of the file, not inside a method)
+require 'Plugins/PHPMailer/vendor/autoload.php';
 
-    require 'Plugins/PHPMailer/vendor/autoload.php';
+class MailService {
+    public function sendMail(array $config, array $mailData): bool {
+        $mailer = new PHPMailer(true);
 
-//Create an instance; passing `true` enables exceptions
-$mail = new PHPMailer(true);
+        try {
+            // SMTP server settings
+            $mailer->SMTPDebug  = SMTP::DEBUG_OFF;   // Disable debug output
+            $mailer->isSMTP();
+            $mailer->Host       = $config['smtp_host'] ?? 'localhost';
+            $mailer->SMTPAuth   = true;
+            $mailer->Username   = $config['smtp_user'] ?? '';
+            $mailer->Password   = $config['smtp_pass'] ?? '';
+            $mailer->SMTPSecure = $config['smtp_secure'] ?? PHPMailer::ENCRYPTION_STARTTLS;
+            $mailer->Port       = $config['smtp_port'] ?? 587;
 
-try {
-    //Server settings
-    $mail->SMTPDebug = SMTP::DEBUG_OFF;                      //Enable verbose debug output
-    $mail->isSMTP();                                            //Send using SMTP
-    $mail->Host       = $conf['smtp_host'];                     //Set the SMTP server to send through
-    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-    $mail->Username   = $conf['smtp_user'];                     //SMTP username
-    $mail->Password   = $conf['smtp_pass'];                     //SMTP password
-    $mail->SMTPSecure = $conf['smtp_secure'];                  //Enable implicit TLS encryption
-    $mail->Port       = $conf['smtp_port'];                     //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+            // Recipients
+            $mailer->setFrom($mailData['mail_from'], $mailData['name_from'] ?? '');
+            $mailer->addAddress($mailData['mail_to'], $mailData['name_to'] ?? '');
 
-    //Recipients
-    $mail->setFrom($mailCnt['mail_from'], $mailCnt['name_from']);
-    $mail->addAddress($mailCnt['mail_to'], $mailCnt['name_to']);     //Add a recipient
+            // Content
+            $mailer->isHTML(true);
+            $mailer->Subject = $mailData['subject'] ?? '(No Subject)';
+            $mailer->Body    = $mailData['body'] ?? '';
 
-    //Content
-    $mail->isHTML(true);                                  //Set email format to HTML
-    $mail->Subject = $mailCnt['subject'];
-    $mail->Body    = $mailCnt['body'];
+            $mailer->send();
+            return true;
 
-    $mail->send();
-    echo 'Message has been sent';
-} catch (Exception $e) {
-    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-}
+        } catch (Exception $e) {
+            // Optionally log $mailer->ErrorInfo
+            return false;
+        }
     }
 }
