@@ -66,7 +66,7 @@ class AuthForms {
             </div>
 
             <?php echo $this->formButton('Sign Up', 'signup'); ?> 
-            <a href="signin.php">Already registered? Log in</a>
+            <a href="signin.php"> Are you already registered? Log in</a>
         </form>
 <?php
     }
