@@ -79,7 +79,7 @@ class PageLayout {
             <div class="col-md-6">
                 <div class="p-4 border rounded bg-body-tertiary">
                     <h2>Light Theme Box</h2>
-                    <p>Add borders and spacing utilities for a clean, structured layout.</p>
+                    <p>Add borders and spacing utilities for a clean, structured and detailed layout.</p>
                     <button class="btn btn-outline-secondary">Explore</button>
                 </div>
             </div>
